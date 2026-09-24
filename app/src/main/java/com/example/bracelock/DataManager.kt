@@ -17,20 +17,37 @@ class DataManager(context: Context) {
         get() = prefs.getLong("wear_start_time", 0L)
         set(value) = prefs.edit().putLong("wear_start_time", value).apply()
 
-    var dailyNotes: String
-        get() = prefs.getString("daily_notes", "") ?: ""
-        set(value) = prefs.edit().putString("daily_notes", value).apply()
+    fun getNotes(): List<String> {
+        val notesString = prefs.getString("saved_notes", "") ?: ""
+        return if (notesString.isEmpty()) emptyList() else notesString.split("||")
+    }
+
+    fun addNote(note: String) {
+        val timestamp = SimpleDateFormat("dd-MM HH:mm", Locale.getDefault()).format(Date())
+        val newEntry = "[$timestamp] $note"
+        val currentNotes = getNotes().toMutableList()
+        currentNotes.add(0, newEntry) // Voeg bovenaan toe
+        prefs.edit().putString("saved_notes", currentNotes.joinToString("||")).apply()
+    }
+
+    fun getHistory(): List<String> {
+        val historyString = prefs.getString("override_logs", "") ?: ""
+        return if (historyString.isEmpty()) emptyList() else historyString.split("\n").filter { it.isNotBlank() }.reversed()
+    }
 
     fun logOverride(reason: String) {
         val currentLogs = prefs.getString("override_logs", "") ?: ""
-        val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-        val newLog = "[$timestamp] Reden: $reason\n"
+        val timestamp = SimpleDateFormat("dd-MM HH:mm", Locale.getDefault()).format(Date())
+        val newLog = "[$timestamp] Override: $reason\n"
         prefs.edit().putString("override_logs", currentLogs + newLog).apply()
         isLocked = false
     }
 
     fun startWearing() {
         wearStartTime = System.currentTimeMillis()
+        val currentLogs = prefs.getString("override_logs", "") ?: ""
+        val timestamp = SimpleDateFormat("dd-MM HH:mm", Locale.getDefault()).format(Date())
+        prefs.edit().putString("override_logs", currentLogs + "[$timestamp] Brace omgedaan\n").apply()
         isLocked = false
     }
 
