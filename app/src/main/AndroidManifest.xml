@@ -5,6 +5,11 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    
+    <!-- Nieuwe rechten voor Agenda en Alarmen -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
@@ -27,6 +32,9 @@
             android:name=".LockService"
             android:enabled="true"
             android:exported="false" />
+
+        <!-- De nieuwe 07:00 wekker ontvanger -->
+        <receiver android:name=".AlarmReceiver" android:exported="true" />
 
     </application>
 </manifest>
